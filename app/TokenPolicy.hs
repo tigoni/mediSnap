@@ -5,8 +5,8 @@ module Main
 import Control.Exception    (throwIO)
 import Data.String          (IsString (..))
 import System.Environment   (getArgs)
-import Sycamore.Nft.OnChain (tokenPolicy)
-import Sycamore.Utils         (unsafeReadTxOutRef, writeMintingPolicy)
+import Utils         (unsafeReadTxOutRef, writeMintingPolicy)
+import Nft.Mint(tokenPolicy)
 
 main :: IO ()
 main = do

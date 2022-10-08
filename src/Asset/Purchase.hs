@@ -85,7 +85,7 @@ purchaseValidator p () () ctx  = validate
         -- collateral added is at least 2 Ada 
         containsRequiredCollateralAmount :: TxOut -> Bool
         containsRequiredCollateralAmount txo =
-          collateralAmnt p <= assetClassValtxOutAddressueOf (txOutValue txo) (collateral p)
+          collateralAmnt p <= assetClassValueOf (txOutValue txo) (collateral p)
 
         beneficiaryIsPaid :: Bool
         beneficiaryIsPaid = assetClassValueOf (valuePaidToAddress ctx (beneficiary p)) (beneficiaryCurrency p) == beneficiaryAmount p

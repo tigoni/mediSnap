@@ -28,22 +28,33 @@ library
     exposed-modules:
       Asset.Purchase 
       Asset.Deploy
+      Utils
+      Nft.Mint
     build-depends:
-      base >= 4.9 && < 5,
-      aeson -any,
-      bytestring -any,
-      containers -any,
-      freer-extras -any,
-      plutus-contract -any,
-      plutus-ledger -any,
-      plutus-ledger-api -any,
-      plutus-ledger-constraints -any,
-      plutus-tx -any,
-      plutus-tx-plugin -any,
-      plutus-script-utils -any,
-      text -any,
-      lens -any,
-      playground-common,
+                      aeson
+                     , base ^>=4.14.1.0
+                     , bytestring
+                     , cardano-api
+                     , cardano-crypto-class
+                     , cardano-ledger-core
+                     , cardano-ledger-shelley
+                     , cardano-wallet-core
+                     , containers
+                     , data-default
+                     , freer-extras
+                     , openapi3
+                     , playground-common
+                     , plutus-contract
+                     , plutus-ledger
+                     , plutus-ledger-api
+                     , plutus-ledger-constraints
+                     , plutus-pab
+                     , plutus-tx-plugin
+                     , plutus-tx
+                     , plutus-use-cases
+                     , prettyprinter
+                     , serialise
+                     , text 
     hs-source-dirs: src
 
 executable token-policy
