@@ -1,37 +1,37 @@
 # # #address2 unlocks FaberCastell#02 NFT from script1
 cardano-cli transaction build-raw \
      --babbage-era \
-    --tx-in cc64916cb5f01b4f951cfca9337e2e07f1ce39a5a727f8954c85228b607d4130#0 \
-    --tx-in-datum-file "../af/mint/unit.json" \
-    --tx-in-redeemer-file "../af/mint/unit.json" \
-    --tx-in-script-file "../af/lock-script/af-purchase.plutus" \
-    --tx-out $(cat ../wallets/wallet2/payment.addr)+"1829818 lovelace + 1 9756702ae3befaa2282ffaa6d992b31a910fcf0b6d757e88d4ae24cc.41463033" \
-    --tx-out $(cat ../wallets/beneficiary1/beneficiary.addr)+2000000 \
-    --tx-out $(cat ../wallets/aggregator/aggregator.addr)+2000000 \
-    --tx-in-collateral "da35e53daba28004e788c470a3cecd920a591bcffd2fc3f3078a31334b96329a#0" \
+    --tx-in 80b06a39bb4d5b67239ff10b30190a17eed5dd176498d1c55053919074d3b9bd#0 \
+    --tx-in-datum-file "../token/lock/unit.json" \
+    --tx-in-redeemer-file "../token/lock/unit.json" \
+    --tx-in-script-file "../token/lock/mds-lock.plutus" \
+    --tx-out $(cat ../wallets/buyer/buyer.addr)+"245007331 lovelace + 1 b34ebf7f6f88c5c9c743992ce2b4e3ad41cc3e01f2c998b12abc7a98.4d656469536e6170" \
+    --tx-out $(cat ../wallets/beneficiary/beneficiary.addr)+2000000 \
+    --tx-out $(cat ../wallets/minter/minter.addr)+2000000 \
+    --tx-in-collateral "dc6fba11e10917236072a200c5e9e8b2c5c95d317d9b924bd736952fb5153c39#0" \
     --tx-in-execution-units="(1000000000, 10000000)" \
-    --protocol-params-file "../af/mint/protocol-params.json" \
-    --fee 992317 \
-    --out-file "../af/unlock-script/tx.body"
+    --protocol-params-file "../token/protocol-params.json" \
+    --fee 992669  \
+    --out-file "../token/unlock/tx.body"
 
 cardano-cli transaction sign \
-    --tx-body-file "../af/unlock-script/tx.body" \
-    --signing-key-file "../wallets/wallet2/payment.skey" \
+    --tx-body-file "../token/unlock/tx.body" \
+    --signing-key-file "../wallets/buyer/buyer.skey" \
     --$TS \
-    --out-file "../af/unlock-script/tx.signed"
+    --out-file "../token/unlock/tx.signed"
 
 cardano-cli transaction submit \
     --$TS \
-   --tx-file "../af/unlock-script/tx.signed"
+   --tx-file "../token/unlock/tx.signed"
 
 
 #    cardano-cli transaction calculate-min-fee \
-#     --tx-body-file  "../af/unlock-script/tx.body" \
+#     --tx-body-file  "../token/unlock/tx.body" \
 #     --tx-in-count 1 \
 #     --tx-out-count 3 \
 #     --witness-count 1 \
 #     --$TS \
-#     --protocol-params-file "../af/mint/protocol-params.json"
+#     --protocol-params-file "../token/protocol-params.json"
 
 
 
