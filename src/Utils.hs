@@ -107,7 +107,7 @@ getCredentials (Plutus.Address x y) = case x of
       in
         case y of
             Nothing                        -> Just (ppkh, Nothing)
-            Just (Plutus.StakingPtr _ _ _) -> Nothing
+            Just Plutus.StakingPtr {}      -> Nothing
             Just (StakingHash h)           -> case h of
                 ScriptCredential _    -> Nothing
                 PubKeyCredential pkh' -> Just (ppkh, Just $ Plutus.StakePubKeyHash pkh')

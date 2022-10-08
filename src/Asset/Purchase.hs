@@ -41,10 +41,10 @@ import           Plutus.V1.Ledger.Value
 
 
 data AssetPurchase = AssetPurchase {
-    saleNftTn :: TokenName
-   ,aggregator   :: Address 
-   ,aggregatorCurrency :: AssetClass
-   ,aggregatorAmount :: Integer
+    nft :: TokenName
+   ,minter :: Address 
+   ,minterCurrency :: AssetClass
+   ,minterAmount :: Integer
    ,beneficiary :: Address
    ,beneficiaryAmount :: Integer
    ,beneficiaryCurrency :: AssetClass
@@ -67,7 +67,7 @@ purchaseValidator p () () ctx  = validate
         validate ::  Bool
         validate =    txHasOneScInputOnly 
                       && validateTxOuts 
-                      && aggregatorIsPaid 
+                      && minterIsPaid 
                       && beneficiaryIsPaid 
 
 --Only one input should exist pointing to a validator
@@ -91,8 +91,8 @@ purchaseValidator p () () ctx  = validate
         beneficiaryIsPaid = assetClassValueOf (valuePaidToAddress ctx (beneficiary p)) (beneficiaryCurrency p) == beneficiaryAmount p
 
 --AR address must have 2 Ada deposited.
-        aggregatorIsPaid :: Bool
-        aggregatorIsPaid = assetClassValueOf (valuePaidToAddress ctx (aggregator p)) (aggregatorCurrency p) == aggregatorAmount p
+        minterIsPaid :: Bool
+        minterIsPaid = assetClassValueOf (valuePaidToAddress ctx (minter p)) (minterCurrency p) == minterAmount p
 
 
         valuePaidToAddress :: ScriptContext -> Address -> Value

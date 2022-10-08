@@ -40,19 +40,19 @@ writeValidator :: FilePath -> L.Validator -> IO (Either (FileError ()) ())
 writeValidator file = writeFileTextEnvelope @(PlutusScript PlutusScriptV1) file Nothing . PlutusScriptSerialised . SBS.toShort . LBS.toStrict . serialise . L.unValidatorScript
 
 writeUnit :: IO ()
-writeUnit = writeJSON "testnet/af/lock-script/unit.json" ()
+writeUnit = writeJSON "token/lock/unit.json" ()
 
 writeRedeemer :: IO () 
-writeRedeemer = writeJSON "testnet/af/lock-script/redeemer.json" ()
+writeRedeemer = writeJSON "token/lock/redeemer.json" ()
 
 writeAssetPurchaseValidator :: IO (Either (FileError ()) ())
-writeAssetPurchaseValidator = writeValidator "testnet/af/lock-script/af-purchase.plutus" $ validator $ AssetPurchase 
+writeAssetPurchaseValidator = writeValidator "token/lock/mds-lock.plutus" $ validator $ AssetPurchase 
                                 {
-                                    saleNftTn = Ledger.Value.tokenName $ TE.encodeUtf8 $ T.pack "AF03"
-                                   ,aggregator = L.pubKeyHashAddress (L.PaymentPubKeyHash $  L.PubKeyHash $ BuiltinByteString $  TE.encodeUtf8 $ T.pack "ccd0cf6cb232ad4def96ebe39dfb4b354a529faed336a086b3c13f4a") Nothing 
-                                   ,aggregatorCurrency = Ledger.Value.assetClass (Ledger.Value.currencySymbol "") (Ledger.Value.tokenName  $ TE.encodeUtf8 $ T.pack "")
-                                   ,aggregatorAmount = 2000000
-                                   ,beneficiary = L.pubKeyHashAddress (L.PaymentPubKeyHash $  L.PubKeyHash $ BuiltinByteString $  TE.encodeUtf8 $ T.pack "ee5aa2d53d16ba90bcb5dec215c612fad8a7062da5e6d04bce21ed82") Nothing
+                                    nft= Ledger.Value.tokenName $ TE.encodeUtf8 $ T.pack "MediSnap"
+                                   ,minter = L.pubKeyHashAddress (L.PaymentPubKeyHash $  L.PubKeyHash $ BuiltinByteString $  TE.encodeUtf8 $ T.pack "bebe8013168a1f3607bddb3a170b0adb12400316a8bcf34b7efedf0a") Nothing 
+                                   ,minterCurrency = Ledger.Value.assetClass (Ledger.Value.currencySymbol "") (Ledger.Value.tokenName  $ TE.encodeUtf8 $ T.pack "")
+                                   ,minterAmount = 2000000
+                                   ,beneficiary = L.pubKeyHashAddress (L.PaymentPubKeyHash $  L.PubKeyHash $ BuiltinByteString $  TE.encodeUtf8 $ T.pack "482421baa0219f801aa40f91dd8ec5d6ded4631a73f09b9d9b29848c") Nothing
                                    ,beneficiaryCurrency = Ledger.Value.assetClass (Ledger.Value.currencySymbol "") (Ledger.Value.tokenName  $ TE.encodeUtf8 $ T.pack "")
                                    ,beneficiaryAmount = 2000000
                                    ,collateral = Ledger.Value.assetClass (Ledger.Value.currencySymbol "") (Ledger.Value.tokenName $ TE.encodeUtf8 $ T.pack "")
