@@ -1,11 +1,11 @@
 cardano-cli transaction build-raw \
     --babbage-era \
-    --tx-in d749922e035b2956e9d38b7fb9fba9dba9bce3cff3a62698778c2cb710f9dd5c#1  \
+    --tx-in 711ba39ed1e5cea705ef8bb094bca230d7d6a78b523e7cfa0beb53be5bf614e4#1 \
     --tx-out-datum-hash-file "../token/lock/unit.json" \
-    --tx-out $(cat ../token/lock/script.addr)+250000000+" 1 b34ebf7f6f88c5c9c743992ce2b4e3ad41cc3e01f2c998b12abc7a98.4d656469536e6170" \
-    --tx-out  $(cat ../wallets/minter/minter.addr)+49821959 \
+    --tx-out $(cat ../token/lock/script.addr)+8000000+" 1 4cfaf7079202490e972c0f18b27018342bb6a69bb37fa7ee55ce8076.4d656469536e6170233133" \
+    --tx-out $(cat ../wallets/minter/minter.addr)+1821871 \
     --out-file "../token/lock/tx.raw" \
-    --fee 178041
+    --fee 178129
 
 cardano-cli transaction sign \
 --signing-key-file "../wallets/minter/minter.skey" \
@@ -22,5 +22,5 @@ cardano-cli transaction submit --tx-file "../token/lock/tx.signed" --$TS
 # --tx-out-count 2 \
 # --witness-count 1 \
 # --$TS \
-# --protocol-params-file "../token/protocol-params.json"
+# --protocol-params-file "../token/lock/protocol-params.json"
 

@@ -6,7 +6,7 @@ tokenName=$3
 addrFile=$4
 skeyFile=$5
 
-rootDir=../token
+rootDir=../token/mint
 echo "oref: $oref"
 echo "amt: $amt"
 echo "tokenName: $tokenName"
@@ -38,7 +38,7 @@ cardano-cli transaction build \
     --babbage-era \
     --tx-in $oref \
     --tx-in-collateral $oref \
-    --tx-out "$address 300000000 lovelace + $value" \
+    --tx-out "$address 10000000 lovelace + $value" \
     --mint "$value" \
     --mint-script-file $serializedPolicyScriptFile \
     --mint-redeemer-file $rootDir/unit.json \
