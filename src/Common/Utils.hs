@@ -5,6 +5,8 @@ module Common.Utils where
 import Ledger
 import PlutusTx.Prelude
 import Plutus.V1.Ledger.Value
+import Plutus.V1.Ledger.Api
+import PlutusTx.Builtins
 
 
 {-# INLINABLE info #-}
@@ -27,7 +29,7 @@ mintFlattened ctx = flattenValue $ txInfoMint (info ctx)
 valuePaidToAddress :: ScriptContext -> Address -> Value
 valuePaidToAddress ctx addr = mconcat
   (fmap txOutValue (filter (\x -> txOutAddress x == addr)
-  (txInfoOutputs (info ctx))))
+  (txInfoOutputs (info ctx))))  
 
 {-# INLINEABLE getUpperBound #-}
 getUpperBound :: ScriptContext -> Maybe POSIXTime
