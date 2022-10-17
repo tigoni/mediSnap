@@ -30,6 +30,9 @@ library
       Asset.Deploy
       Utils
       Nft.Mint
+    other-modules:
+      Common.Utils
+
     build-depends:
                       aeson
                      , base ^>=4.14.1.0
@@ -55,6 +58,7 @@ library
                      , prettyprinter
                      , serialise
                      , text 
+                     , hex
     hs-source-dirs: src
 
 executable token-policy

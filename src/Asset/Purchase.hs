@@ -17,58 +17,40 @@
 
 module Asset.Purchase where 
 
-import           Control.Monad        hiding (fmap)
-import           Data.List.NonEmpty   (NonEmpty (..))
-import           Data.Map             as Map hiding (filter)
-import           Data.Text            (pack, Text)
-import           Data.Void 
 import           Data.Aeson             (ToJSON, FromJSON)
 import           GHC.Generics           (Generic)
-import           Text.Printf          (printf)
-import           Prelude              (IO, Show, Semigroup (..), String, undefined) 
-import           Schema               (ToSchema)
+import           Prelude              (Show) 
 
-import           Ledger               hiding (singleton)
-import           Ledger.Constraints   as Constraints
-import qualified Ledger.Typed.Scripts as    Scripts
-import           Ledger.Ada           as Ada
-import           Plutus.V1.Ledger.Api
-import           Plutus.Contract      
-import           PlutusTx             (Data (..))
 import qualified PlutusTx
 import           PlutusTx.Prelude     hiding (Semigroup(..),unless)
+import           Ledger               hiding (singleton)
+import qualified Ledger.Typed.Scripts as Scripts
 import           Plutus.V1.Ledger.Value
+import qualified Common.Utils             as U
 
 
-data AssetPurchase = AssetPurchase {
-    nft :: TokenName
-   ,minter :: Address 
-   ,minterCurrency :: AssetClass
-   ,minterAmount :: Integer
-   ,beneficiary :: Address
-   ,beneficiaryAmount :: Integer
-   ,beneficiaryCurrency :: AssetClass
-   ,collateral :: AssetClass
-   ,collateralAmnt :: Integer
+data TransferParams = TransferParams {
+    asset :: !TokenName
+   ,minterAddress :: !Address 
+   ,minterCurrency :: !AssetClass
+   ,minterAmount :: !Integer
+   ,collateralCurrency :: !AssetClass
+   ,collateralAmount :: !Integer
 } deriving (Show, Generic, FromJSON, ToJSON)
 
+PlutusTx.makeLift ''TransferParams
+-- PlutusTx.makeIsDataIndexed ''TransferParamsDatum [('TransferParamsDatum, 0)]
 
-PlutusTx.makeLift ''AssetPurchase
--- PlutusTx.makeIsDataIndexed ''AssetPurchaseDatum [('AssetPurchaseDatum, 0)]
-
---pragma {# INLINABLE func #}: allows the compiler to inline the definition of `purchaseValidator` inside the `||` brackets
+--pragma {# INLINABLE func #}: allows the compiler to inline the definition of `transferValidator` inside the `||` brackets
 --Any function that is to be used for on-chain code will need this validator.
-{-# INLINABLE purchaseValidator #-}
+{-# INLINABLE transferValidator #-}
 
 --this function will be supplied to `mkTypedValidator` which will compile it into Plutus Core.
-purchaseValidator :: AssetPurchase -> () -> () -> ScriptContext -> Bool 
-purchaseValidator p () () ctx  = validate 
+transferValidator :: TransferParams -> () -> () -> ScriptContext -> Bool 
+transferValidator p () () ctx  = validate 
     where
         validate ::  Bool
-        validate =    txHasOneScInputOnly 
-                      && validateTxOuts 
-                      && minterIsPaid 
-                      && beneficiaryIsPaid 
+        validate =   txHasOneScInputOnly && validateTxOuts && minterIsPaid 
 
 --Only one input should exist pointing to a validator
         txHasOneScInputOnly :: Bool
@@ -85,19 +67,14 @@ purchaseValidator p () () ctx  = validate
         -- collateral added is at least 2 Ada 
         containsRequiredCollateralAmount :: TxOut -> Bool
         containsRequiredCollateralAmount txo =
-          collateralAmnt p <= assetClassValueOf (txOutValue txo) (collateral p)
+          collateralAmount p <= assetClassValueOf (txOutValue txo) (collateralCurrency p)
 
-        beneficiaryIsPaid :: Bool
-        beneficiaryIsPaid = assetClassValueOf (valuePaidToAddress ctx (beneficiary p)) (beneficiaryCurrency p) == beneficiaryAmount p
+        -- beneficiaryIsPaid :: Bool
+        -- beneficiaryIsPaid = assetClassValueOf (valuePaidToAddress ctx (beneficiary p)) (beneficiaryCurrency p) == beneficiaryAmount p
 
---AR address must have 2 Ada deposited.
+        --AR address must have 2 Ada deposited.
         minterIsPaid :: Bool
-        minterIsPaid = assetClassValueOf (valuePaidToAddress ctx (minter p)) (minterCurrency p) == minterAmount p
-
-
-        valuePaidToAddress :: ScriptContext -> Address -> Value
-        valuePaidToAddress ctx addr = mconcat (fmap txOutValue (filter (\x -> txOutAddress x == addr) (txInfoOutputs (scriptContextTxInfo ctx))))
-
+        minterIsPaid = assetClassValueOf (U.valuePaidToAddress ctx (minterAddress p)) (minterCurrency p) == minterAmount p
         
 --for typed validators, we need to inform the Plutus compiler by creating a new type that encodes 
 --the information about the datum and redeemer that plutus core expects.
@@ -106,20 +83,20 @@ instance Scripts.ValidatorTypes TypedValidator where
     type instance DatumType TypedValidator = ()
     type instance RedeemerType TypedValidator = () 
 
-typedValidator :: AssetPurchase -> Scripts.TypedValidator TypedValidator
+typedValidator :: TransferParams -> Scripts.TypedValidator TypedValidator
 typedValidator p = Scripts.mkTypedValidator @TypedValidator
-    ($$(PlutusTx.compile [|| purchaseValidator ||]) `PlutusTx.applyCode` PlutusTx.liftCode p)
+    ($$(PlutusTx.compile [|| transferValidator ||]) `PlutusTx.applyCode` PlutusTx.liftCode p)
     $$(PlutusTx.compile [|| wrap ||])
   where
     wrap = Scripts.wrapValidator @() @()
 
-validator :: AssetPurchase -> Validator
+validator :: TransferParams -> Validator
 validator = Scripts.validatorScript . typedValidator
 
 --generate hash of the validator
-valHash :: AssetPurchase -> Ledger.ValidatorHash
+valHash :: TransferParams -> Ledger.ValidatorHash
 valHash = Scripts.validatorHash . typedValidator
 
 --generate address from the validator
-scrAddress :: AssetPurchase -> Ledger.Address
+scrAddress :: TransferParams -> Ledger.Address
 scrAddress = scriptAddress . validator

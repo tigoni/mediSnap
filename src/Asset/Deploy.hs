@@ -17,12 +17,18 @@ import qualified Data.ByteString.Lazy  as LBS
 import qualified Data.ByteString.Short as SBS
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
+import Data.Hex
+import Data.String (IsString (..)) 
 
 import           PlutusTx              (Data (..))
 import qualified PlutusTx
-import qualified Ledger as L
-import qualified Ledger.Value
-import PlutusTx.Builtins.Internal
+import qualified PlutusTx.Prelude as PP
+import qualified PlutusTx.Builtins.Class as PBC
+import qualified Ledger  as L             hiding (singleton)
+import qualified Ledger.Address as LA
+import qualified Plutus.V1.Ledger.Value as LV
+import           Plutus.V1.Ledger.Api as LP
+import           Plutus.V1.Ledger.Bytes (getLedgerBytes)
 
 import          Asset.Purchase 
 
@@ -46,15 +52,16 @@ writeRedeemer :: IO ()
 writeRedeemer = writeJSON "token/lock/redeemer.json" ()
 
 writeAssetPurchaseValidator :: IO (Either (FileError ()) ())
-writeAssetPurchaseValidator = writeValidator "token/lock/mds-lock.plutus" $ validator $ AssetPurchase 
+writeAssetPurchaseValidator = writeValidator "token/lock/mds-lock.plutus" $ validator $ TransferParams 
                                 {
-                                    nft= Ledger.Value.tokenName $ TE.encodeUtf8 $ T.pack "MediSnap"
-                                   ,minter = L.pubKeyHashAddress (L.PaymentPubKeyHash $  L.PubKeyHash $ BuiltinByteString $  TE.encodeUtf8 $ T.pack "bebe8013168a1f3607bddb3a170b0adb12400316a8bcf34b7efedf0a") Nothing 
-                                   ,minterCurrency = Ledger.Value.assetClass (Ledger.Value.currencySymbol "") (Ledger.Value.tokenName  $ TE.encodeUtf8 $ T.pack "")
+                                    asset= LV.TokenName $ getLedgerBytes $ fromString $ hex "MediSnap#10" --use PlutusTx for this
+                                   ,minterAddress = LA.pubKeyHashAddress (LA.PaymentPubKeyHash $  PubKeyHash $ PBC.stringToBuiltinByteString "bebe8013168a1f3607bddb3a170b0adb12400316a8bcf34b7efedf0a") Nothing 
+                                   ,minterCurrency = LV.assetClass adaSymbol (TokenName $ PBC.stringToBuiltinByteString "")
                                    ,minterAmount = 2000000
-                                   ,beneficiary = L.pubKeyHashAddress (L.PaymentPubKeyHash $  L.PubKeyHash $ BuiltinByteString $  TE.encodeUtf8 $ T.pack "482421baa0219f801aa40f91dd8ec5d6ded4631a73f09b9d9b29848c") Nothing
-                                   ,beneficiaryCurrency = Ledger.Value.assetClass (Ledger.Value.currencySymbol "") (Ledger.Value.tokenName  $ TE.encodeUtf8 $ T.pack "")
-                                   ,beneficiaryAmount = 2000000
-                                   ,collateral = Ledger.Value.assetClass (Ledger.Value.currencySymbol "") (Ledger.Value.tokenName $ TE.encodeUtf8 $ T.pack "")
-                                   ,collateralAmnt = 2000000
+                                   ,collateralCurrency = LV.assetClass adaSymbol (TokenName $ PBC.stringToBuiltinByteString "")
+                                   ,collateralAmount = 2000000
                                 }
+
+
+
+-- {-# INLINABLE toTokenName #-} toTokenName :: String -> TokenName toTokenName tn = TokenName { unTokenName = getLedgerBytes $ fromString $ hex tn } 
