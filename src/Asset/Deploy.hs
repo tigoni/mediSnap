@@ -56,9 +56,9 @@ writeAssetPurchaseValidator = writeValidator "token/lock/mds-lock.plutus" $ vali
                                 {
                                     asset= TokenName $ getLedgerBytes $ fromString $ hex "MediSnap#10" --use PlutusTx for this
                                    ,minterAddress = pubKeyHashAddress (PaymentPubKeyHash $  PubKeyHash $ stringToBuiltinByteString "bebe8013168a1f3607bddb3a170b0adb12400316a8bcf34b7efedf0a") Nothing 
-                                   ,minterCurrency = assetClass adaSymbol (TokenName $ stringToBuiltinByteString "")
+                                   ,minterCurrency = assetClass adaSymbol adaToken
                                    ,minterAmount = 2000000
-                                   ,collateralCurrency = assetClass adaSymbol (TokenName $ stringToBuiltinByteString "")
+                                   ,collateralCurrency = assetClass adaSymbol adaToken
                                    ,collateralAmount = 2000000
                                 }
 

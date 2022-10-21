@@ -1,11 +1,11 @@
 # # #address2 unlocks FaberCastell#02 NFT from script1
 cardano-cli transaction build \
      --babbage-era \
-    --tx-in e9bf5fde641f039acdc86399190e83ff413e2c122d135570540c516dee4bdc7b#0 \
+    --tx-in 345227b75ce8b7f6851c563dc90a6d2ae510016af997c9d3659c110159709f60#0 \
     --tx-in-datum-file "../token/lock/unit.json" \
     --tx-in-redeemer-file "../token/lock/unit.json" \
     --tx-in-script-file "../token/lock/mds-lock.plutus" \
-    --tx-out $(cat ../wallets/buyer/buyer.addr)+"2000000 lovelace + 1 27c0e23065d174355b8db2615d569b41eb01c2fb40cc9144b18d15e5.4d656469536e6170233132"\
+    --tx-out $(cat ../wallets/buyer/buyer.addr)+"2000000 lovelace + 1 c317ee36aaa3e6947435bc337928ca80387b8d6ddbda1fc147604a30.4d656469536e6170233135"\
     --tx-out $(cat ../wallets/beneficiary/beneficiary.addr)+2000000 \
     --tx-out $(cat ../wallets/minter/minter.addr)+2000000 \
     --tx-in-collateral "dc6fba11e10917236072a200c5e9e8b2c5c95d317d9b924bd736952fb5153c39#0" \

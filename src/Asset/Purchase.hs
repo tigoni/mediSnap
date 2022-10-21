@@ -1,7 +1,7 @@
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE DeriveAnyClass             #-}
 {-# LANGUAGE DeriveGeneric              #-}
-{-# LANGUAGE DerivingStrategies         #-}
+-- {-# LANGUAGE DerivingStrategies         #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE LambdaCase                 #-}
@@ -20,23 +20,26 @@ module Asset.Purchase where
 import           Cardano.Api.Shelley (PlutusScript (..), PlutusScriptV1)
 
 import           Codec.Serialise ( serialise )
+import           Prelude (Semigroup (..), Show (..), String)
 import           Data.Aeson           (ToJSON, FromJSON)
 import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Short as SBS
 import GHC.Generics (Generic)
-import           Plutus.V1.Ledger.Value
+
+import           Ledger
 import           Ledger.Address
+import qualified Ledger.Typed.Scripts as Scripts
 import           Plutus.V1.Ledger.Time
 import           Plutus.V1.Ledger.Scripts
-import qualified Ledger.Typed.Scripts as Scripts
-
-import           Prelude                 (Semigroup (..), Show (..))
-import           PlutusTx.Prelude hiding (Semigroup (..))
-import qualified PlutusTx
-import           Ledger               hiding (singleton)
+import           Plutus.V1.Ledger.Api
 import qualified Plutus.V1.Ledger.Scripts as Plutus
+import           Plutus.V1.Ledger.Value
+import           PlutusTx.Builtins.Class
+import qualified Plutus.V1.Ledger.Contexts as PVC
+
+import qualified PlutusTx
+import           PlutusTx.Prelude hiding (Semigroup (..), unless)
 import qualified Common.Utils             as U
-import Plutus.V1.Ledger.Api
 
 data TransferParams = TransferParams {
     asset :: !TokenName
@@ -59,7 +62,7 @@ transferValidator :: TransferParams -> () -> () -> ScriptContext -> Bool
 transferValidator p () () ctx  = validate 
     where
         validate ::  Bool
-        validate =   txHasOneScInputOnly && validateTxOuts && minterIsPaid 
+        validate =   txHasOneScInputOnly && validateTxOuts && sellerIsPaid 
 
 --Only one input should exist pointing to a validator
         txHasOneScInputOnly :: Bool
@@ -78,12 +81,24 @@ transferValidator p () () ctx  = validate
         containsRequiredCollateralAmount txo =
           collateralAmount p <= assetClassValueOf (txOutValue txo) (collateralCurrency p)
 
+        txVal :: Value 
+        txVal = assetClassValue (assetClass adaSymbol adaToken) 2000000 
+
+        txOut :: PVC.TxOut
+        txOut = PVC.TxOut (minterAddress p) txVal Nothing
+
+        sellerIsPaid :: Bool
+        sellerIsPaid =  txVal `elem` (fmap txOutValue $ filter (\x -> PVC.txOutValue x == txVal) (PVC.txInfoOutputs (PVC.scriptContextTxInfo ctx)))
+
         -- beneficiaryIsPaid :: Bool
         -- beneficiaryIsPaid = assetClassValueOf (valuePaidToAddress ctx (beneficiary p)) (beneficiaryCurrency p) == beneficiaryAmount p
 
-        --AR address must have 2 Ada deposited.
-        minterIsPaid :: Bool
-        minterIsPaid = assetClassValueOf (U.valuePaidToAddress ctx (minterAddress p)) (minterCurrency p) == minterAmount p
+        -- --AR address must have 2 Ada deposited.
+        -- minterAddress :: Address
+        -- minterAddress = pubKeyHashAddress (PaymentPubKeyHash $  PubKeyHash $ stringToBuiltinByteString "bebe8013168a1f3607bddb3a170b0adb12400316a8bcf34b7efedf0a") Nothing 
+        -- minterIsPaid :: Bool
+        -- minterIsPaid =  elem minterAddress (txOutAddress (filter (\x -> txOutAddress x == minterAddress) (txInfoOutputs (scriptContextTxInfo ctx))))  && 2000000 == minterAmount p
+        -- -- minterIsPaid = assetClassValueOf (U.valuePaidToAddress ctx (minterAddress p)) (minterCurrency p) == minterAmount p
         
 --for typed validators, we need to inform the Plutus compiler by creating a new type that encodes 
 --the information about the datum and redeemer that plutus core expects.
