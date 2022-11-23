@@ -30,6 +30,8 @@ library
       Asset.Deploy
       Utils
       Nft.Mint
+      Asset.Vesting
+      Asset.Trace
     other-modules:
       Common.Utils
 

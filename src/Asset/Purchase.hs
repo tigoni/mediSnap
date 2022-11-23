@@ -92,13 +92,6 @@ transferValidator p () () ctx  = validate
 
         -- beneficiaryIsPaid :: Bool
         -- beneficiaryIsPaid = assetClassValueOf (valuePaidToAddress ctx (beneficiary p)) (beneficiaryCurrency p) == beneficiaryAmount p
-
-        -- --AR address must have 2 Ada deposited.
-        -- minterAddress :: Address
-        -- minterAddress = pubKeyHashAddress (PaymentPubKeyHash $  PubKeyHash $ stringToBuiltinByteString "bebe8013168a1f3607bddb3a170b0adb12400316a8bcf34b7efedf0a") Nothing 
-        -- minterIsPaid :: Bool
-        -- minterIsPaid =  elem minterAddress (txOutAddress (filter (\x -> txOutAddress x == minterAddress) (txInfoOutputs (scriptContextTxInfo ctx))))  && 2000000 == minterAmount p
-        -- -- minterIsPaid = assetClassValueOf (U.valuePaidToAddress ctx (minterAddress p)) (minterCurrency p) == minterAmount p
         
 --for typed validators, we need to inform the Plutus compiler by creating a new type that encodes 
 --the information about the datum and redeemer that plutus core expects.

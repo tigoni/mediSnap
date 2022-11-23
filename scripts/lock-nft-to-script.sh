@@ -1,8 +1,8 @@
 cardano-cli transaction build-raw \
     --babbage-era \
-    --tx-in 295fb73b56a192d8f983b975a09f5e4ee63fae75ca210148e247d9c3403c25dc#1 \
+    --tx-in aeea9c9def9bb0118fc78ac405e118e9ad942693898d11ba81c6f53ef9ca62a2#1 \
     --tx-out-datum-hash-file "../token/lock/unit.json" \
-    --tx-out $(cat ../token/lock/mds-lock.addr)+8000000+" 1 c317ee36aaa3e6947435bc337928ca80387b8d6ddbda1fc147604a30.4d656469536e6170233135" \
+    --tx-out $(cat ../token/lock/mds-lock.addr)+8000000+" 1 cc9b25586a29e084962fc74619af931450e2168bd1cd20161aedd537.4d656469536e6170233232" \
     --tx-out $(cat ../wallets/minter/minter.addr)+1821871 \
     --out-file "../token/lock/tx.raw" \
     --fee 178129
